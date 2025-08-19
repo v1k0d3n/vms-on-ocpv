@@ -1,0 +1,17 @@
+apiVersion: v2
+name: vms-on-ocpv
+description: A Helm chart that deploys Virtual Machines on OpenShift Virtualization
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - kubevirt
+  - virtualization
+  - vm
+  - openshift
+home: https://github.com/v1k0d3n/vms-on-ocpv
+sources:
+  - https://github.com/v1k0d3n/vms-on-ocpv
+maintainers:
+  - name: v1k0d3n
+    email: v1k0d3n@example.com

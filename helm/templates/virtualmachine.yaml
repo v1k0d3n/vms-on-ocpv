@@ -1,0 +1,76 @@
+{{- range $i := until (.Values.VirtualMachine.count | int) }}
+{{- $vmName := printf "%s-%02d" $.Values.VirtualMachine.baseName $i }}
+{{- $hexValue := printf "%02X" $i }}
+{{- $macAddress := printf "%s:%s" $.Values.VirtualMachine.resources.network.baseMAC $hexValue }}
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: {{ $vmName }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "vms-on-ocpv.labels" $ | nindent 4 }}
+    {{- with $.Values.common.metadata.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with $.Values.common.metadata.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  runStrategy: {{ $.Values.VirtualMachine.template.runStrategy }}
+  dataVolumeTemplates:
+  {{- range $.Values.VirtualMachine.resources.disks }}
+  - metadata:
+      name: {{ $vmName }}-{{ .name }}
+    spec:
+      source:
+        blank: {}
+      storage:
+        resources:
+          requests:
+            storage: {{ .diskSize }}
+        storageClassName: {{ $.Values.VirtualMachine.resources.storageClass }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "vms-on-ocpv.labels" $ | nindent 8 }}
+        {{- with $.Values.common.metadata.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      architecture: {{ $.Values.VirtualMachine.template.architecture }}
+      domain:
+        cpu:
+          cores: {{ $.Values.VirtualMachine.resources.cpuCount }}
+        devices:
+          disks:
+          {{- range $.Values.VirtualMachine.resources.disks }}
+          - name: {{ .name }}
+            disk:
+              bus: virtio
+            {{- if .bootOrder }}
+            bootOrder: {{ .bootOrder }}
+            {{- end }}
+          {{- end }}
+          interfaces:
+          - bridge: {}
+            macAddress: {{ $macAddress | quote }}
+            name: {{ $vmName }}-eth0
+        machine:
+          type: {{ $.Values.VirtualMachine.template.machineType }}
+        memory:
+          guest: {{ $.Values.VirtualMachine.resources.memoryCount }}
+        resources: {}
+      networks:
+      - multus:
+          networkName: {{ $.Values.VirtualMachine.resources.network.networkName }}
+        name: {{ $vmName }}-eth0
+      volumes:
+      {{- range $.Values.VirtualMachine.resources.disks }}
+      - dataVolume:
+          name: {{ $vmName }}-{{ .name }}
+        name: {{ .name }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,36 @@
+# Default values for vms-on-ocpv
+# This is a YAML-formatted file.
+
+# Common metadata that will be applied to all resources
+common:
+  metadata:
+    labels:
+      environment: development
+      owner: v1k0d3n
+      demo: ztp-cnv
+      redfish-enabled: "true"
+    annotations:
+      description: "This cluster was created using the vms-on-ocpv Helm chart"
+
+# Virtual Machine configuration
+VirtualMachine:
+  baseName: ztp-jinkit-kvm
+  count: 3
+  resources:
+    cpuCount: 20
+    memoryCount: 48Gi
+    disks:
+      - name: disk1
+        diskSize: 120Gi
+      - name: disk2
+        diskSize: 100Gi
+    storageClass: lvms-vg1-immediate
+    network:
+      networkName: default/vlan3
+      baseMAC: "00:50:56:03:17"
+  
+  # VM template configuration
+  template:
+    architecture: amd64
+    machineType: pc-q35-rhel9.6.0
+    runStrategy: Always
