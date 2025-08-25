@@ -5,9 +5,9 @@
 common:
   metadata:
     labels:
-      environment: development
+      environment: ztp-testing
       owner: v1k0d3n
-      demo: ztp-cnv
+      demo: ztp-kubevirt-redfish
       redfish-enabled: "true"
     annotations:
       description: "This cluster was created using the vms-on-ocpv Helm chart"
@@ -16,6 +16,9 @@ common:
 VirtualMachine:
   baseName: ztp-jinkit-kvm
   count: 3
+  runStrategy: Halted
+  architecture: amd64
+  machineType: pc-q35-rhel9.6.0
   resources:
     cpuCount: 20
     memoryCount: 48Gi
@@ -28,9 +31,3 @@ VirtualMachine:
     network:
       networkName: default/vlan3
       baseMAC: "00:50:56:03:17"
-  
-  # VM template configuration
-  template:
-    architecture: amd64
-    machineType: pc-q35-rhel9.6.0
-    runStrategy: Always

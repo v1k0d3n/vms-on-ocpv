@@ -18,7 +18,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  runStrategy: {{ $.Values.VirtualMachine.template.runStrategy }}
+  runStrategy: {{ $.Values.VirtualMachine.runStrategy }}
   dataVolumeTemplates:
   {{- range $.Values.VirtualMachine.resources.disks }}
   - metadata:
@@ -40,7 +40,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      architecture: {{ $.Values.VirtualMachine.template.architecture }}
+      architecture: {{ $.Values.VirtualMachine.architecture }}
       domain:
         cpu:
           cores: {{ $.Values.VirtualMachine.resources.cpuCount }}
@@ -59,7 +59,7 @@ spec:
             macAddress: {{ $macAddress | quote }}
             name: {{ $vmName }}-eth0
         machine:
-          type: {{ $.Values.VirtualMachine.template.machineType }}
+          type: {{ $.Values.VirtualMachine.machineType }}
         memory:
           guest: {{ $.Values.VirtualMachine.resources.memoryCount }}
         resources: {}
